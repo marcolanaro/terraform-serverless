@@ -1,0 +1,16 @@
+type Mutation {
+	putTenant(id: ID!): Tenant
+}
+
+type Query {
+	getTenantById(id: ID!): Tenant
+}
+
+type Tenant {
+	id: ID!
+}
+
+schema {
+	query: Query
+	mutation: Mutation
+}

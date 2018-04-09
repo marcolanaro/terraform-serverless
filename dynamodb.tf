@@ -2,10 +2,20 @@ resource "aws_dynamodb_table" "tenants" {
   name           = "tenants"
   read_capacity  = 1
   write_capacity = 1
-  hash_key       = "name"
+  hash_key       = "id"
 
   attribute {
-    name = "name"
+    name = "id"
     type = "S"
+  }
+
+  attribute {
+    name = "createdAt"
+    type = "N"
+  }
+
+  attribute {
+    name = "updatedAt"
+    type = "N"
   }
 }
