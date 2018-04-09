@@ -10,14 +10,14 @@ resource "aws_appsync_graphql_api" "graphql" {
   }
 }
 
-resource "aws_appsync_datasource" "list" {
+resource "aws_appsync_datasource" "tenants" {
   api_id           = "${aws_appsync_graphql_api.graphql.id}"
-  name             = "list"
+  name             = "tenants"
   type             = "AMAZON_DYNAMODB"
-  service_role_arn = "${aws_iam_role.appsync_graphql_dynamodb_list.arn}"
+  service_role_arn = "${aws_iam_role.appsync_graphql_dynamodb_tenants.arn}"
 
   dynamodb_config {
-    region     = "us-west-1"
-    table_name = "${aws_dynamodb_table.list.name}"
+    region     = "eu-west-1"
+    table_name = "${aws_dynamodb_table.tenants.name}"
   }
 }
