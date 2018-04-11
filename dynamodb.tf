@@ -8,14 +8,4 @@ resource "aws_dynamodb_table" "tenants" {
     name = "id"
     type = "S"
   }
-
-  attribute {
-    name = "createdAt"
-    type = "N"
-  }
-
-  attribute {
-    name = "updatedAt"
-    type = "N"
-  }
 }

@@ -1,5 +1,5 @@
-resource "aws_iam_role" "appsync_graphql_dynamodb_tenants" {
-  name = "appsync_graphql_dynamodb_tenants"
+resource "aws_iam_role" "appsync_graphql" {
+  name = "appsync_graphql"
 
   assume_role_policy = <<EOF
 {
@@ -17,9 +17,9 @@ resource "aws_iam_role" "appsync_graphql_dynamodb_tenants" {
 EOF
 }
 
-resource "aws_iam_role_policy" "appsync_graphql_dynamodb_tenants_policy" {
-  name = "appsync_graphql_dynamodb_tenants_policy"
-  role = "${aws_iam_role.appsync_graphql_dynamodb_tenants.id}"
+resource "aws_iam_role_policy" "appsync_graphql_policy" {
+  name = "appsync_graphql_policy"
+  role = "${aws_iam_role.appsync_graphql.id}"
 
   policy = <<EOF
 {
@@ -27,11 +27,13 @@ resource "aws_iam_role_policy" "appsync_graphql_dynamodb_tenants_policy" {
   "Statement": [
     {
       "Action": [
-        "dynamodb:*"
+        "dynamodb:*",
+        "lambda:*"
       ],
       "Effect": "Allow",
       "Resource": [
-        "${aws_dynamodb_table.tenants.arn}"
+        "${aws_dynamodb_table.tenants.arn}",
+        "${aws_lambda_function.approve_tenant.arn}"
       ]
     }
   ]
