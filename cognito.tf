@@ -26,3 +26,72 @@ resource "aws_cognito_user_pool_client" "client" {
   callback_urls                = ["http://localhost"]
   logout_urls                  = ["http://localhost"]
 }
+
+resource "aws_cognito_identity_pool" "main" {
+  identity_pool_name               = "main identity pool"
+  allow_unauthenticated_identities = false
+
+  cognito_identity_providers {
+    client_id               = "${aws_cognito_user_pool_client.client.id}"
+    provider_name           = "cognito-idp.eu-west-1.amazonaws.com/${aws_cognito_user_pool.main.id}"
+    server_side_token_check = false
+  }
+}
+
+resource "aws_cognito_identity_pool_roles_attachment" "main" {
+  identity_pool_id = "${aws_cognito_identity_pool.main.id}"
+
+  roles {
+    "authenticated" = "${aws_iam_role.authenticated.arn}"
+  }
+}
+
+resource "aws_iam_role" "authenticated" {
+  name = "cognito_authenticated"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "cognito-identity.amazonaws.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "cognito-identity.amazonaws.com:aud": "${aws_cognito_identity_pool.main.id}"
+        },
+        "ForAnyValue:StringLike": {
+          "cognito-identity.amazonaws.com:amr": "authenticated"
+        }
+      }
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "authenticated" {
+  name = "authenticated_policy"
+  role = "${aws_iam_role.authenticated.id}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cognito-sync:*",
+        "cognito-identity:*"
+      ],
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+}
+EOF
+}
